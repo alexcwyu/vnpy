@@ -12,27 +12,25 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Office/Business :: Financial :: Investment",
     "Natural Language :: Chinese (Simplified)",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10"
+requires-python = "==3.13.*"
 dependencies = [
     "tzlocal>=5.3.1",
-    "PySide6==6.8.2.1",
+    "PySide6>=6.10.0",
     "pyqtgraph>=0.13.7",
     "qdarkstyle>=3.2.3",
-    "numpy>=2.2.3",
-    "pandas>=2.2.3",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
     "ta-lib>=0.6.4",
     "deap>=1.4.2",
-    "pyzmq>=26.3.0",
-    "plotly>=6.0.0",
+    "pyzmq>=27.1.0",
+    "plotly>=6.4.0",
     "tqdm>=4.67.1",
     "loguru>=0.7.3",
     "nbformat>=5.10.4"
@@ -42,17 +40,19 @@ keywords = ["quant", "quantitative", "investment", "trading", "algotrading"]
 [project.optional-dependencies]
 alpha = [
     "polars>=1.26.0",
-    "scipy>=1.15.2",
+    "scipy>=1.16.3",
     "alphalens-reloaded>=0.4.5",
-    "scikit-learn>=1.6.1",
+    "scikit-learn>=1.7.2",
     "lightgbm>=4.6.0",
     "torch>=2.6.0",
-    "pyarrow>=19.0.1",
+    "pyarrow>=21.0.0,<22",  # Constrained for workspace compatibility
 ]
 dev = [
     "pandas-stubs>=2.2.3.250308",
     "hatchling>=1.27.0",
     "babel>=2.17.0",
+    "pytest>=9.0.1",
+    "black>=25.11.0",
 ]
 
 [project.urls]
@@ -84,7 +84,7 @@ path = "vnpy/trader/locale/build_hook.py"
 "vnpy/trader/locale/en/LC_MESSAGES/vnpy.mo" = "vnpy/trader/locale/en/LC_MESSAGES/vnpy.mo"
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py313"
 output-format = "full"
 
 [tool.ruff.lint]
@@ -98,7 +98,7 @@ select = [
 ignore = ["E501"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.13"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
