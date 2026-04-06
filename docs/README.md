@@ -1,5 +1,8 @@
 # VeighNa (vnpy) Documentation
 
+> **Last Updated**: 2026-04-06T16:25:30Z  \
+> **Git Hash**: `ecae5699`
+
 > **Version**: 4.3.0 | **License**: MIT | **Python**: 3.13+ | **Author**: Xiaoyou Chen
 
 ## Overview
