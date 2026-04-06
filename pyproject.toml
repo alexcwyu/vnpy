@@ -47,13 +47,25 @@ alpha = [
     "torch>=2.6.0",
     "pyarrow>=21.0.0,<22",  # Constrained for workspace compatibility
 ]
-dev = [
+dev-legacy = [
     "pandas-stubs>=2.2.3.250308",
     "hatchling>=1.27.0",
     "babel>=2.17.0",
     "pytest>=9.0.1",
     "black>=25.11.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pandas-stubs>=2.2.3.250308",
+    "hatchling>=1.27.0",
+    "babel>=2.17.0",
+    "pytest>=9.0",
+    "black>=25.11.0",
+]
+
+[tool.uv]
+default-groups = ["dev"]
 
 [project.urls]
 "Homepage" = "https://www.vnpy.com"
@@ -67,34 +79,36 @@ requires = ["hatchling>=1.27.0", "babel>=2.17.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "vnpy/__init__.py"
+path = "src/vnpy/__init__.py"
 pattern = "__version__ = ['\"](?P<version>[^'\"]+)['\"]"
 
 [tool.hatch.build.targets.wheel]
-packages = ["vnpy"]
+packages = ["src/vnpy"]
 include-package-data = true
 
 [tool.hatch.build.targets.sdist]
-include = ["vnpy*"]
+include = ["src/vnpy*"]
 
 [tool.hatch.build.hooks.custom]
-path = "vnpy/trader/locale/build_hook.py"
+path = "src/vnpy/trader/locale/build_hook.py"
 
 [tool.hatch.build.targets.wheel.force-include]
-"vnpy/trader/locale/en/LC_MESSAGES/vnpy.mo" = "vnpy/trader/locale/en/LC_MESSAGES/vnpy.mo"
+"src/vnpy/trader/locale/en/LC_MESSAGES/vnpy.mo" = "vnpy/trader/locale/en/LC_MESSAGES/vnpy.mo"
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = ["-ra", "-q", "--strict-markers", "--import-mode=importlib"]
+testpaths = ["tests"]
+pythonpath = ["src"]
+xfail_strict = true
+filterwarnings = ["error"]
 
 [tool.ruff]
 target-version = "py313"
 output-format = "full"
 
 [tool.ruff.lint]
-select = [
-    "B",  # flake8-bugbear
-    "E",  # pycodestyle error
-    "F",  # pyflakes
-    "UP",  # pyupgrade
-    "W",  # pycodestyle warning
-]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "C4", "RUF", "PERF", "TC", "PTH"]
 ignore = ["E501"]
 
 [tool.mypy]
