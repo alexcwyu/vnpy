@@ -1,0 +1,241 @@
+{
+  "repository": "vnpy",
+  "source_commit_before_documentation_commit": "4efb0ded688007aced430207510203a264690190",
+  "recorded_on": "2026-10-12",
+  "records": [
+    {
+      "command": "uv build --python 3.14",
+      "exit_code": 0,
+      "seconds": 1.94,
+      "check": "build",
+      "original_log": "vnpy-build.log",
+      "log_sha256": "df113077a786620717e121cadde8376cacfc67f0bed5cf7acea5290732a26c8b",
+      "outcomes": [
+        "Successfully built dist/vnpy-4.5.0.tar.gz",
+        "Successfully built dist/vnpy-4.5.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "command": "uv build --python 3.14",
+      "exit_code": 0,
+      "seconds": 1.21,
+      "check": "build-final",
+      "original_log": "vnpy-build-final.log",
+      "log_sha256": "df113077a786620717e121cadde8376cacfc67f0bed5cf7acea5290732a26c8b",
+      "outcomes": [
+        "Successfully built dist/vnpy-4.5.0.tar.gz",
+        "Successfully built dist/vnpy-4.5.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "command": "/Users/alex/.local/share/uv/python/cpython-3.14-macos-aarch64-none/bin/python3.14 -m compileall -q src",
+      "exit_code": 0,
+      "seconds": 0.3,
+      "check": "compile",
+      "original_log": "vnpy-compile.log",
+      "log_sha256": "cdad8d31f71f9ca30ecb973875a31a35e82562441812821f059e0f67f0cb87cf",
+      "outcomes": []
+    },
+    {
+      "command": "uv run --no-sync python -m compileall -q src",
+      "exit_code": 0,
+      "seconds": 0.13,
+      "check": "compile-final",
+      "original_log": "vnpy-compile-final.log",
+      "log_sha256": "18836bd061fd2cbbcee4cfbe11a0c5bb8956a47a78decc98b17bdc695bd896a7",
+      "outcomes": []
+    },
+    {
+      "command": "uv lock --upgrade --python 3.14",
+      "exit_code": 0,
+      "seconds": 1.27,
+      "check": "lock-3.14",
+      "original_log": "vnpy-lock-3.14.log",
+      "log_sha256": "1f0bd01f810b4954cc3699cffacdd618f0c76acf2d6b2c7cbd197a2f30189b04",
+      "outcomes": []
+    },
+    {
+      "command": "uv lock --upgrade --python 3.15",
+      "exit_code": 0,
+      "seconds": 1.41,
+      "check": "lock-3.15",
+      "original_log": "vnpy-lock-3.15.log",
+      "log_sha256": "16aca488cc3d4c386ddad7f74b68bcabfdcf6dbd274cef19c8c8fa14d4fc7051",
+      "outcomes": []
+    },
+    {
+      "command": "uv lock --upgrade --python 3.14",
+      "exit_code": 0,
+      "seconds": 1.49,
+      "check": "lock-missing-dependencies",
+      "original_log": "vnpy-lock-missing-dependencies.log",
+      "log_sha256": "7d10a61bec523b222a7995edba5515433de339b300f45803d41e293107412c9d",
+      "outcomes": []
+    },
+    {
+      "command": "uv sync --directory /tmp/trading-python315-probes/vnpy --all-extras --all-groups --python 3.15",
+      "exit_code": 2,
+      "seconds": 1.9,
+      "check": "python315-source-probe",
+      "original_log": "vnpy-python315-source-probe.log",
+      "log_sha256": "beefe0cbda9b948684536810b7efcb71a71dcdf12f699c6b9345d6419d7cf66d",
+      "outcomes": []
+    },
+    {
+      "command": "uv sync --all-extras --all-groups --python 3.14",
+      "exit_code": 0,
+      "seconds": 0.83,
+      "check": "sync-3.14",
+      "original_log": "vnpy-sync-3.14.log",
+      "log_sha256": "eb3b44e37ec059607b6a920e7649a15a9f3ea53c63204481ad0415a549bfdbe1",
+      "outcomes": []
+    },
+    {
+      "command": "uv sync --all-extras --all-groups --python 3.14",
+      "exit_code": 0,
+      "seconds": 1.39,
+      "check": "sync-missing-dependencies",
+      "original_log": "vnpy-sync-missing-dependencies.log",
+      "log_sha256": "3d2c7a36fca2b6c7ed608dfe86b991498f7578452737a12e0e2e9b780d17c4c7",
+      "outcomes": []
+    },
+    {
+      "command": "uv run --no-sync python -m pytest",
+      "exit_code": 1,
+      "seconds": 5.86,
+      "check": "tests",
+      "original_log": "vnpy-tests.log",
+      "log_sha256": "84e6f2b57b5355e7efe396810346a9e21336ff67c85e18b9089ccb41530aa123",
+      "outcomes": []
+    },
+    {
+      "command": "uv run --no-sync python -m pytest <workspace>/vnpy/tests",
+      "exit_code": 2,
+      "seconds": 6.39,
+      "check": "tests-absolute-suite",
+      "original_log": "vnpy-tests-absolute-suite.log",
+      "log_sha256": "dfcc109ec9e6f6d6943a60b1850dbfa7de41eb8bfc2c86cc528777b1475560c6",
+      "outcomes": []
+    },
+    {
+      "command": "uv run --no-sync python -m pytest <workspace>/vnpy/tests",
+      "exit_code": 0,
+      "seconds": 56.3,
+      "check": "tests-alpha-rpc-compatibility",
+      "original_log": "vnpy-tests-alpha-rpc-compatibility.log",
+      "log_sha256": "2aebaca2cabff57503bbc4c0a115f82175ce50cae2bb0de05db409aa20691995",
+      "outcomes": [
+        "162 passed in 54.00s"
+      ]
+    },
+    {
+      "command": "uv run --no-sync python -m pytest src/vnpy",
+      "exit_code": 5,
+      "seconds": 0.55,
+      "check": "tests-existing-source",
+      "original_log": "vnpy-tests-existing-source.log",
+      "log_sha256": "6dda601f98eb3b5cb708967592387b2ffe5f9b24847118b81b30eb44b7ca022b",
+      "outcomes": []
+    },
+    {
+      "command": "uv run --no-sync python -m pytest <workspace>/vnpy/tests",
+      "exit_code": 1,
+      "seconds": 59.67,
+      "check": "tests-missing-dependencies",
+      "original_log": "vnpy-tests-missing-dependencies.log",
+      "log_sha256": "debf75efdfb6d8c192eeb9016e9bfb5894e026437663920bcb67784a0e9d5c6d",
+      "outcomes": [
+        "6 failed, 156 passed in 57.55s"
+      ]
+    },
+    {
+      "command": "uv run --no-sync python -c import sys,importlib.metadata,json; print(sys.version); print(json.dumps({d.metadata[\"Name\"]: d.version for d in importlib.metadata.distributions()},indent=2,sort_keys=True))",
+      "exit_code": 0,
+      "seconds": 0.18,
+      "check": "versions-final",
+      "original_log": "vnpy-versions-final.log",
+      "log_sha256": "4fd4d446ac0b7e1cad96c4543e284e43e56ebf03ae657da93eb9a4afce8128ac",
+      "outcomes": []
+    },
+    {
+      "command": "uv sync --all-extras --all-groups --python 3.14 --no-build --no-install-project",
+      "exit_code": 0,
+      "seconds": 20.55,
+      "check": "wheel-probe-3.14",
+      "original_log": "vnpy-wheel-probe-3.14.log",
+      "log_sha256": "2e9603e41d32294f132d718d01982386adb47e9c456c58c76933914fec3c2017",
+      "outcomes": []
+    },
+    {
+      "command": "uv sync --all-extras --all-groups --python 3.15 --no-build --no-install-project",
+      "exit_code": 2,
+      "seconds": 0.06,
+      "check": "wheel-probe-3.15",
+      "original_log": "vnpy-wheel-probe-3.15.log",
+      "log_sha256": "700469453abf9061cdfaa6a7c353f09fdc85ca8d59a16c4031380039b1c6e079",
+      "outcomes": []
+    }
+  ],
+  "summary": {
+    "repo": "vnpy",
+    "branch": "feature/ayu_develop",
+    "blockers": [],
+    "started": "2026-10-12T00:22:33+0800",
+    "dependency_updates": [
+      {
+        "from": "pyarrow>=21.0.0",
+        "to": "pyarrow>=26.0.0"
+      }
+    ],
+    "lock": "passed",
+    "python": "3.14",
+    "sync": "passed",
+    "build": "passed",
+    "compile": "passed",
+    "tests": "passed",
+    "test_summary": "$ uv run --no-sync python -m pytest <workspace>/vnpy/tests\n........................................................................ [ 44%]\n........................................................................ [ 88%]\n..................                                                       [100%]\n162 passed in 54.00s\n",
+    "finished": "2026-10-12T00:23:07+0800",
+    "head": "4efb0ded688007aced430207510203a264690190",
+    "notes": [
+      "The complete162-case upstream suite passes. Tests use an absolute directory because conftest changes the working directory before testpath resolution.",
+      "Alpha all-NaN rolling windows return NaN using guarded counts, sums and variances rather than warning-producing reductions. RPC worker shutdown closes sockets and terminates its owned ZeroMQ context.",
+      "Current statsmodels and the SQLite database plugin are explicit alpha/dev dependencies needed by supplied tests. Qt/native ML extras constrain Python support."
+    ],
+    "python_version": "3.14.8 (main, Oct  9 2026, 15:11:09) [Clang 22.1.3 ]",
+    "failed_attempts": [
+      {
+        "python": "3.15",
+        "stage": "native wheel probe",
+        "details": "$ uv sync --all-extras --all-groups --python 3.15 --no-build --no-install-project\nUsing CPython 3.15.0\nCreating virtual environment at: .venv\nResolved 100 packages in 13ms\nerror: Distribution `ta-lib==0.8.1 @ registry+https://pypi.org/simple` can't be installed because it is marked as `--no-build` but has no binary distribution\n"
+      },
+      {
+        "stage": "tests",
+        "details": "$ uv run --no-sync python -m pytest\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 203, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pytest/__main__.py\", line 9, in <module>\n    raise SystemExit(_console_main())\n                     ~~~~~~~~~~~~~^^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 253, in _console_main\n    code = _main(prog=_get_prog_name(sys.argv))\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 223, in _main\n    config = _prepareconfig(new_args, plugins, prog=prog)\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 410, in _prepareconfig\n    config: Config = pluginmanager.hook.pytest_cmdline_parse(\n                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        pluginmanager=pluginmanager, args=args\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_hooks.py\", line 512, in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_manager.py\", line 120, in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 167, in _multicall\n    raise exception\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 139, in _multicall\n    teardown.throw(exception)\n    ~~~~~~~~~~~~~~^^^^^^^^^^^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/helpconfig.py\", line 124, in pytest_cmdline_parse\n    config = yield\n             ^^^^^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 121, in _multicall\n    res = hook_impl.function(*args)\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 1232, in pytest_cmdline_parse\n    self.parse(args)\n    ~~~~~~~~~~^^^^^^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 1624, in parse\n    self.args, self.args_source = self._decide_args(\n                                  ~~~~~~~~~~~~~~~~~^\n        args=getattr(self.option, FILE_OR_DIR),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<4 lines>...\n        warn=True,\n        ^^^^^^^^^^\n    )\n    ^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 1430, in _decide_args\n    self.issue_config_time_warning(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        PytestConfigWarning(warning_text), stacklevel=3\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py\", line 1654, in issue_config_time_warning\n    warnings.warn(warning, stacklevel=stacklevel)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\npytest.PytestConfigWarning: No files were found in testpaths; consider removing or adjusting your testpaths configuration. Searching recursively from the current directory instead.\n"
+      },
+      {
+        "stage": "tests",
+        "details": "$ uv run --no-sync python -m pytest <workspace>/vnpy/tests\n\n==================================== ERRORS ====================================\n_______________ ERROR collecting tests/alpha/test_cs_function.py _______________\nImportError while importing test module '<workspace>/vnpy/tests/alpha/test_cs_function.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/alpha/test_cs_function.py:7: in <module>\n    from vnpy.alpha.dataset.cs_function import cs_rank\n<workspace>/vnpy/src/vnpy/alpha/__init__.py:6: in <module>\n    from .dataset import AlphaDataset, Segment, to_datetime, register_functions\n<workspace>/vnpy/src/vnpy/alpha/dataset/__init__.py:5: in <module>\n    from .template import AlphaDataset\n<workspace>/vnpy/src/vnpy/alpha/dataset/template.py:18: in <module>\n    from .factor_performance import (\n<workspace>/vnpy/src/vnpy/alpha/dataset/factor_performance.py:13: in <module>\n    from statsmodels.regression.linear_model import OLS  # type: ignore[import-untyped]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'statsmodels'\n________________ ERROR collecting tests/alpha/test_dataproxy.py ________________\nImportError while importing test module '<workspace>/vnpy/tests/alpha/test_dataproxy.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/alpha/test_dataproxy.py:6: in <module>\n    from vnpy.alpha.dataset.utility import DataProxy\n<workspace>/vnpy/src/vnpy/alpha/__init__.py:6: in <module>\n    from .dataset import AlphaDataset, Segment, to_datetime, register_functions\n<workspace>/vnpy/src/vnpy/alpha/dataset/__init__.py:5: in <module>\n    from .template import AlphaDataset\n<workspace>/vnpy/src/vnpy/alpha/dataset/template.py:18: in <module>\n    from .factor_performance import (\n<workspace>/vnpy/src/vnpy/alpha/dataset/factor_performance.py:13: in <module>\n    from statsmodels.regression.linear_model import OLS  # type: ignore[import-untyped]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'statsmodels'\n_______________ ERROR collecting tests/alpha/test_expression.py ________________\nImportError while importing test module '<workspace>/vnpy/tests/alpha/test_expression.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/alpha/test_expression.py:6: in <module>\n    from vnpy.alpha.dataset.utility import calculate_by_expression\n<workspace>/vnpy/src/vnpy/alpha/__init__.py:6: in <module>\n    from .dataset import AlphaDataset, Segment, to_datetime, register_functions\n<workspace>/vnpy/src/vnpy/alpha/dataset/__init__.py:5: in <module>\n    from .template import AlphaDataset\n<workspace>/vnpy/src/vnpy/alpha/dataset/template.py:18: in <module>\n    from .factor_performance import (\n<workspace>/vnpy/src/vnpy/alpha/dataset/factor_performance.py:13: in <module>\n    from statsmodels.regression.linear_model import OLS  # type: ignore[import-untyped]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'statsmodels'\n_______________ ERROR collecting tests/alpha/test_ta_function.py _______________\nImportError while importing test module '<workspace>/vnpy/tests/alpha/test_ta_function.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/alpha/test_ta_function.py:7: in <module>\n    from vnpy.alpha.dataset.ta_function import ta_atr, ta_rsi\n<workspace>/vnpy/src/vnpy/alpha/__init__.py:6: in <module>\n    from .dataset import AlphaDataset, Segment, to_datetime, register_functions\n<workspace>/vnpy/src/vnpy/alpha/dataset/__init__.py:5: in <module>\n    from .template import AlphaDataset\n<workspace>/vnpy/src/vnpy/alpha/dataset/template.py:18: in <module>\n    from .factor_performance import (\n<workspace>/vnpy/src/vnpy/alpha/dataset/factor_performance.py:13: in <module>\n    from statsmodels.regression.linear_model import OLS  # type: ignore[import-untyped]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'statsmodels'\n___________________ ERROR collecting tests/test_alpha101.py ____________________\nImportError while importing test module '<workspace>/vnpy/tests/test_alpha101.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/test_alpha101.py:6: in <module>\n    from vnpy.alpha.dataset.utility import calculate_by_expression\n<workspace>/vnpy/src/vnpy/alpha/__init__.py:6: in <module>\n    from .dataset import AlphaDataset, Segment, to_datetime, register_functions\n<workspace>/vnpy/src/vnpy/alpha/dataset/__init__.py:5: in <module>\n    from .template import AlphaDataset\n<workspace>/vnpy/src/vnpy/alpha/dataset/template.py:18: in <module>\n    from .factor_performance import (\n<workspace>/vnpy/src/vnpy/alpha/dataset/factor_performance.py:13: in <module>\n    from statsmodels.regression.linear_model import OLS  # type: ignore[import-untyped]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'statsmodels'\n_______________ ERROR collecting tests/test_alpha_backtesting.py _______________\nImportError while importing test module '<workspace>/vnpy/tests/test_alpha_backtesting.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/test_alpha_backtesting.py:6: in <module>\n    from vnpy.alpha.lab import AlphaLab\n<workspace>/vnpy/src/vnpy/alpha/__init__.py:6: in <module>\n    from .dataset import AlphaDataset, Segment, to_datetime, register_functions\n<workspace>/vnpy/src/vnpy/alpha/dataset/__init__.py:5: in <module>\n    from .template import AlphaDataset\n<workspace>/vnpy/src/vnpy/alpha/dataset/template.py:18: in <module>\n    from .factor_performance import (\n<workspace>/vnpy/src/vnpy/alpha/dataset/factor_performance.py:13: in <module>\n    from statsmodels.regression.linear_model import OLS  # type: ignore[import-untyped]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'statsmodels'\n_________________ ERROR collecting tests/test_data_services.py _________________\nImportError while importing test module '<workspace>/vnpy/tests/test_data_services.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n<workspace>/vnpy/tests/test_data_services.py:6: in <module>\n    from vnpy_sqlite import Database as SqliteDatabase\nE   ModuleNotFoundError: No module named 'vnpy_sqlite'\n=========================== short test summary info ============================\nERROR tests/alpha/test_cs_function.py\nERROR tests/alpha/test_dataproxy.py\nERROR tests/alpha/test_expression.py\nERROR tests/alpha/test_ta_function.py\nERROR tests/test_alpha101.py\nERROR tests/test_alpha_backtesting.py\nERROR tests/test_data_services.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 7 errors during collection !!!!!!!!!!!!!!!!!!!!\n7 errors in 4.40s\n",
+        "label": "tests-absolute-suite"
+      },
+      {
+        "stage": "tests",
+        "details": "ent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/zmq/sugar/context.py\", line 134, in __del__\n    |     warn(\n    |     ~~~~^\n    |         f\"Unclosed context {self}\",\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<2 lines>...\n    |         source=self,\n    |         ^^^^^^^^^^^^\n    |     )\n    |     ^\n    | ResourceWarning: Unclosed context <zmq.Context() at 0x11f838ec0>\n    | \n    | The above exception was the direct cause of the following exception:\n    | \n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/unraisableexception.py\", line 67, in collect_unraisable\n    |     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))\n    |     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    | pytest.PytestUnraisableExceptionWarning: Exception ignored while calling deallocator <function Context.__del__ at 0x11f286980>: None\n    | \n    +---------------- 2 ----------------\n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/zmq/sugar/context.py\", line 134, in __del__\n    |     warn(\n    |     ~~~~^\n    |         f\"Unclosed context {self}\",\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<2 lines>...\n    |         source=self,\n    |         ^^^^^^^^^^^^\n    |     )\n    |     ^\n    | ResourceWarning: Unclosed context <zmq.Context() at 0x11f839160>\n    | \n    | The above exception was the direct cause of the following exception:\n    | \n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/unraisableexception.py\", line 67, in collect_unraisable\n    |     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))\n    |     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    | pytest.PytestUnraisableExceptionWarning: Exception ignored while calling deallocator <function Context.__del__ at 0x11f286980>: None\n    | \n    +------------------------------------\n__________ test_publish_pickling_error_does_not_block_later_messages ___________\n  + Exception Group Traceback (most recent call last):\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/runner.py\", line 361, in from_call\n  |     result: TResult | None = func()\n  |                              ~~~~^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/runner.py\", line 250, in <lambda>\n  |     lambda: runtest_hook(item=item, **kwds),\n  |             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_hooks.py\", line 512, in __call__\n  |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n  |            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_manager.py\", line 120, in _hookexec\n  |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n  |            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 167, in _multicall\n  |     raise exception\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 139, in _multicall\n  |     teardown.throw(exception)\n  |     ~~~~~~~~~~~~~~^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/logging.py\", line 865, in pytest_runtest_call\n  |     yield\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 139, in _multicall\n  |     teardown.throw(exception)\n  |     ~~~~~~~~~~~~~~^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/capture.py\", line 900, in pytest_runtest_call\n  |     return (yield)\n  |             ^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 139, in _multicall\n  |     teardown.throw(exception)\n  |     ~~~~~~~~~~~~~~^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/skipping.py\", line 268, in pytest_runtest_call\n  |     return (yield)\n  |             ^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/pluggy/_callers.py\", line 121, in _multicall\n  |     res = hook_impl.function(*args)\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/unraisableexception.py\", line 183, in pytest_runtest_call\n  |     collect_unraisable(item.config)\n  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^\n  |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/unraisableexception.py\", line 81, in collect_unraisable\n  |     raise ExceptionGroup(\"multiple unraisable exception warnings\", errors)\n  | ExceptionGroup: multiple unraisable exception warnings (2 sub-exceptions)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/zmq/sugar/context.py\", line 134, in __del__\n    |     warn(\n    |     ~~~~^\n    |         f\"Unclosed context {self}\",\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<2 lines>...\n    |         source=self,\n    |         ^^^^^^^^^^^^\n    |     )\n    |     ^\n    | ResourceWarning: Unclosed context <zmq.Context() at 0x11f89d450>\n    | \n    | The above exception was the direct cause of the following exception:\n    | \n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/unraisableexception.py\", line 67, in collect_unraisable\n    |     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))\n    |     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    | pytest.PytestUnraisableExceptionWarning: Exception ignored while calling deallocator <function Context.__del__ at 0x11f286980>: None\n    | \n    +---------------- 2 ----------------\n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/zmq/sugar/context.py\", line 134, in __del__\n    |     warn(\n    |     ~~~~^\n    |         f\"Unclosed context {self}\",\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<2 lines>...\n    |         source=self,\n    |         ^^^^^^^^^^^^\n    |     )\n    |     ^\n    | ResourceWarning: Unclosed context <zmq.Context() at 0x11f1d5a70>\n    | \n    | The above exception was the direct cause of the following exception:\n    | \n    | Traceback (most recent call last):\n    |   File \"<workspace>/vnpy/.venv/lib/python3.14/site-packages/_pytest/unraisableexception.py\", line 67, in collect_unraisable\n    |     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))\n    |     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    | pytest.PytestUnraisableExceptionWarning: Exception ignored while calling deallocator <function Context.__del__ at 0x11f286980>: None\n    | \n    +------------------------------------\n=========================== short test summary info ============================\nFAILED tests/test_alpha101.py::TestAlpha101::test_alpha27 - RuntimeWarning: M...\nFAILED tests/test_alpha101.py::TestAlpha101::test_alpha34 - RuntimeWarning: D...\nFAILED tests/test_rpc.py::test_remote_call_returns_value_and_wraps_server_exception\nFAILED tests/test_rpc.py::test_empty_subscription_delivers_payload_and_hides_heartbeat\nFAILED tests/test_rpc.py::test_topic_subscription_filters_prefixes_and_keeps_heartbeat\nFAILED tests/test_rpc.py::test_publish_pickling_error_does_not_block_later_messages\n6 failed, 156 passed in 57.55s\n",
+        "label": "tests-missing-dependencies"
+      }
+    ],
+    "unresolved_blockers": [],
+    "default_ancestry": {
+      "refs/remotes/origin/master": true
+    },
+    "merge_in_progress": false,
+    "artifact_files": [
+      "dist/.gitignore",
+      "dist/vnpy-4.5.0-py3-none-any.whl",
+      "dist/vnpy-4.5.0.tar.gz"
+    ],
+    "committed": true,
+    "pushed": false,
+    "worktree_status": ""
+  },
+  "note": "Full raw logs are retained in the workspace maintenance evidence, not distributed here. Hashes identify those original logs. A successful build or selected test subset does not imply a full test-suite pass. Commands containing <workspace> describe the original execution environment."
+}

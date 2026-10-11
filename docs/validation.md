@@ -37,26 +37,26 @@ Unsuccessful rows are retained as historical compatibility attempts; they are no
 
 | Command | Exit | Seconds | Evidence |
 |---|---:|---:|---|
-| `uv lock --upgrade --python 3.15` | 0 | 1.41 | [log](../../docs/maintenance-2026-10-12/vnpy-lock-3.15.log) |
-| `uv sync --all-extras --all-groups --python 3.15 --no-build --no-install-project` | 2 | 0.06 | [log](../../docs/maintenance-2026-10-12/vnpy-wheel-probe-3.15.log) |
-| `uv lock --upgrade --python 3.14` | 0 | 1.27 | [log](../../docs/maintenance-2026-10-12/vnpy-lock-3.14.log) |
-| `uv sync --all-extras --all-groups --python 3.14 --no-build --no-install-project` | 0 | 20.55 | [log](../../docs/maintenance-2026-10-12/vnpy-wheel-probe-3.14.log) |
-| `uv sync --all-extras --all-groups --python 3.14` | 0 | 0.83 | [log](../../docs/maintenance-2026-10-12/vnpy-sync-3.14.log) |
-| `uv build --python 3.14` | 0 | 1.94 | [log](../../docs/maintenance-2026-10-12/vnpy-build.log) |
-| `/Users/alex/.local/share/uv/python/cpython-3.14-macos-aarch64-none/bin/python3.14 -m compileall -q src` | 0 | 0.3 | [log](../../docs/maintenance-2026-10-12/vnpy-compile.log) |
-| `uv run --no-sync python -m pytest` | 1 | 5.86 | [log](../../docs/maintenance-2026-10-12/vnpy-tests.log) |
-| `uv run --no-sync python -m pytest src/vnpy` | 5 | 0.55 | [log](../../docs/maintenance-2026-10-12/vnpy-tests-existing-source.log) |
-| `uv run --no-sync python -m pytest /Users/alex/workspaces/trading/vnpy/tests` | 2 | 6.39 | [log](../../docs/maintenance-2026-10-12/vnpy-tests-absolute-suite.log) |
-| `uv lock --upgrade --python 3.14` | 0 | 1.49 | [log](../../docs/maintenance-2026-10-12/vnpy-lock-missing-dependencies.log) |
-| `uv sync --all-extras --all-groups --python 3.14` | 0 | 1.39 | [log](../../docs/maintenance-2026-10-12/vnpy-sync-missing-dependencies.log) |
-| `uv run --no-sync python -m pytest /Users/alex/workspaces/trading/vnpy/tests` | 1 | 59.67 | [log](../../docs/maintenance-2026-10-12/vnpy-tests-missing-dependencies.log) |
-| `uv run --no-sync python -m pytest /Users/alex/workspaces/trading/vnpy/tests` | 0 | 56.3 | [log](../../docs/maintenance-2026-10-12/vnpy-tests-alpha-rpc-compatibility.log) |
-| `uv run --no-sync python -m compileall -q src` | 0 | 0.13 | [log](../../docs/maintenance-2026-10-12/vnpy-compile-final.log) |
-| `uv build --python 3.14` | 0 | 1.21 | [log](../../docs/maintenance-2026-10-12/vnpy-build-final.log) |
-| `uv run --no-sync python -c import sys,importlib.metadata,json; print(sys.version); print(json.dumps({d.metadata["Name"]: d.version for d in importlib.metadata.distributions()},indent=2,sort_keys=True))` | 0 | 0.18 | [log](../../docs/maintenance-2026-10-12/vnpy-versions-final.log) |
-| `uv sync --directory /tmp/trading-python315-probes/vnpy --all-extras --all-groups --python 3.15` | 2 | 1.9 | [log](../../docs/maintenance-2026-10-12/vnpy-python315-source-probe.log) |
+| `uv lock --upgrade --python 3.15` | 0 | 1.41 | [check record](maintenance/index.html) |
+| `uv sync --all-extras --all-groups --python 3.15 --no-build --no-install-project` | 2 | 0.06 | [check record](maintenance/index.html) |
+| `uv lock --upgrade --python 3.14` | 0 | 1.27 | [check record](maintenance/index.html) |
+| `uv sync --all-extras --all-groups --python 3.14 --no-build --no-install-project` | 0 | 20.55 | [check record](maintenance/index.html) |
+| `uv sync --all-extras --all-groups --python 3.14` | 0 | 0.83 | [check record](maintenance/index.html) |
+| `uv build --python 3.14` | 0 | 1.94 | [check record](maintenance/index.html) |
+| `/Users/alex/.local/share/uv/python/cpython-3.14-macos-aarch64-none/bin/python3.14 -m compileall -q src` | 0 | 0.3 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -m pytest` | 1 | 5.86 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -m pytest src/vnpy` | 5 | 0.55 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -m pytest /Users/alex/workspaces/trading/vnpy/tests` | 2 | 6.39 | [check record](maintenance/index.html) |
+| `uv lock --upgrade --python 3.14` | 0 | 1.49 | [check record](maintenance/index.html) |
+| `uv sync --all-extras --all-groups --python 3.14` | 0 | 1.39 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -m pytest /Users/alex/workspaces/trading/vnpy/tests` | 1 | 59.67 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -m pytest /Users/alex/workspaces/trading/vnpy/tests` | 0 | 56.3 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -m compileall -q src` | 0 | 0.13 | [check record](maintenance/index.html) |
+| `uv build --python 3.14` | 0 | 1.21 | [check record](maintenance/index.html) |
+| `uv run --no-sync python -c import sys,importlib.metadata,json; print(sys.version); print(json.dumps({d.metadata["Name"]: d.version for d in importlib.metadata.distributions()},indent=2,sort_keys=True))` | 0 | 0.18 | [check record](maintenance/index.html) |
+| `uv sync --directory /tmp/trading-python315-probes/vnpy --all-extras --all-groups --python 3.15` | 2 | 1.9 | [check record](maintenance/index.html) |
 
-The versions-final log records the exact interpreter patch release and every installed dependency version. The machine-readable [result](../../docs/maintenance-2026-10-12/vnpy-result.json) includes branch/default ancestry, status, artifacts and unresolved checks.
+The versions-final log records the exact interpreter patch release and every installed dependency version. The machine-readable [verification record](maintenance/verification.json) includes branch/default ancestry, status, artifacts and unresolved checks.
 
 ## Dependency floor refresh
 
