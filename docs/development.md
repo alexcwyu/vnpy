@@ -1,3 +1,35 @@
+<!-- ayu-maintenance-2026-10-12 -->
+# Current uv development workflow
+
+The maintained branch is `feature/ayu_develop`. The selected interpreter is Python `3.14`; `requires-python` records the range that was actually resolved. Python 3.15 was attempted first. Dependency/native-wheel failures and fallback evidence are recorded in [validation.md](validation.md).
+
+```sh
+export UV_PYTHON_PREFERENCE=only-managed
+uv python install 3.14
+uv lock --check
+uv sync --frozen --all-extras --all-groups
+uv run --no-sync python -m compileall -q src
+uv build
+uv run --no-sync python -m pytest "$PWD/tests"
+```
+
+Use `uv lock --upgrade` when intentionally refreshing dependencies, then review `pyproject.toml`, `uv.lock`, and the existing full test suite. The dependency floors were refreshed from current PyPI release metadata while preserving meaningful upstream upper bounds. Compatibility exceptions are documented with their resolver/test evidence rather than hidden by disabling tests.
+
+The `src/` layout and build-backend package discovery preserve public import names. Wheel/sdist resources include the source-associated data and templates. Optional vendor SDKs, live credentials, databases and graphical/native libraries retain their original runtime requirements. Examples and test fixtures are not promoted into the library API.
+
+<!-- prior-development-notes -->
+
+## Compatibility decisions
+
+- The complete162-case upstream suite passes. Tests use an absolute directory because conftest changes the working directory before testpath resolution.
+- Alpha all-NaN rolling windows return NaN using guarded counts, sums and variances rather than warning-producing reductions. RPC worker shutdown closes sockets and terminates its owned ZeroMQ context.
+- Current statsmodels and the SQLite database plugin are explicit alpha/dev dependencies needed by supplied tests. Qt/native ML extras constrain Python support.
+
+
+
+
+
+
 # Development Guide
 
 ## Development Setup

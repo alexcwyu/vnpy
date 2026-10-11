@@ -605,19 +605,23 @@ def _reduce_rank_axis(windows: np.ndarray) -> np.ndarray:
 
 
 def _reduce_mean_axis(windows: np.ndarray) -> np.ndarray:
-    """Vectorized nanmean over the last axis."""
+    """Vectorized nanmean, retaining NaN for an empty window."""
+    count = np.sum(~np.isnan(windows), axis=-1)
+    result = np.full(count.shape, np.nan, dtype=np.float64)
     with np.errstate(all="ignore"):
-        result: np.ndarray = np.asarray(np.nanmean(windows, axis=-1), dtype=np.float64)
+        np.divide(np.nansum(windows, axis=-1), count, out=result, where=count > 0)
     return result
 
 
 def _reduce_std_axis(windows: np.ndarray) -> np.ndarray:
-    """Vectorized nanstd over the last axis."""
+    """Population nanstd, retaining NaN for an empty window."""
+    mean = _reduce_mean_axis(windows)
+    count = np.sum(~np.isnan(windows), axis=-1)
+    result = np.full(count.shape, np.nan, dtype=np.float64)
     with np.errstate(all="ignore"):
-        result: np.ndarray = np.asarray(
-            np.nanstd(windows, axis=-1, ddof=0),
-            dtype=np.float64,
-        )
+        squared = np.nansum((windows - mean[..., None]) ** 2, axis=-1)
+        np.divide(squared, count, out=result, where=count > 0)
+        np.sqrt(result, out=result)
     return result
 
 

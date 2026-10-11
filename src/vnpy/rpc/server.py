@@ -128,6 +128,7 @@ class RpcServer:
         # Unbind socket address
         self._socket_pub.close()
         self._socket_rep.close()
+        self._context.term()
 
     def publish(self, topic: str, data: object) -> None:
         """

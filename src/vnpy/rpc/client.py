@@ -164,6 +164,7 @@ class RpcClient:
         # Close socket
         self._socket_req.close()
         self._socket_sub.close()
+        self._context.term()
 
     def callback(self, topic: str, data: Any) -> None:
         """

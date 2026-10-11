@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Current uv development workflow</title><style>
+:root{color-scheme:light dark;--bg:#f6f8fa;--paper:#fff;--fg:#182332;--muted:#526274;--line:#d9e0e7;--accent:#1769aa}
+@media(prefers-color-scheme:dark){:root{--bg:#111820;--paper:#192330;--fg:#e6edf3;--muted:#a0b3c5;--line:#344354;--accent:#71b7ee}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,sans-serif}
+header{border-bottom:1px solid var(--line);padding:16px max(24px,calc((100vw - 1120px)/2));background:var(--paper);font-size:14px}
+main{max-width:1120px;margin:32px auto;padding:40px 48px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+h1,h2,h3,h4{line-height:1.3;scroll-margin-top:24px}h1{font-size:2.1rem}h2{margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:.35em}h3{margin-top:1.8em}
+a{color:var(--accent);text-underline-offset:3px}code{font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--bg);border-radius:4px;padding:2px 5px}pre{overflow:auto;border:1px solid var(--line);background:var(--bg);padding:16px;border-radius:7px}pre code{padding:0;background:none}
+table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:14px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left}th{background:var(--bg)}blockquote{border-left:4px solid var(--accent);margin:16px 0;padding:4px 20px;color:var(--muted)}
+.diagram{overflow-x:auto;margin:24px 0;padding:20px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#182332}.mermaid{border:0;background:none;text-align:center}.mermaid svg{height:auto;max-width:100%}details{font-size:13px;color:#526274}.headerlink{margin-left:.4em;font-size:.7em;text-decoration:none;color:var(--muted)}
+@media(max-width:740px){main{margin:0;padding:24px 18px;border:0;border-radius:0}h1{font-size:1.7rem}.diagram{padding:8px}}
+@media print{header,details,.headerlink{display:none}body,main{background:#fff;color:#000;border:0;margin:0;padding:0}a{color:#000}.diagram,pre{break-inside:avoid}}
+</style></head><body><header>Engineering documentation · <a href="development.md">Markdown source</a></header><main><!-- ayu-maintenance-2026-10-12 -->
+<h1 id="current-uv-development-workflow">Current uv development workflow<a class="headerlink" href="#current-uv-development-workflow" title="Permanent link">&para;</a></h1>
+<p>The maintained branch is <code>feature/ayu_develop</code>. The selected interpreter is Python <code>3.14</code>; <code>requires-python</code> records the range that was actually resolved. Python 3.15 was attempted first. Dependency/native-wheel failures and fallback evidence are recorded in <a href="validation.md">validation.md</a>.</p>
+<pre><code class="language-sh">export UV_PYTHON_PREFERENCE=only-managed
+uv python install 3.14
+uv lock --check
+uv sync --frozen --all-extras --all-groups
+uv run --no-sync python -m compileall -q src
+uv build
+uv run --no-sync python -m pytest &quot;$PWD/tests&quot;
+</code></pre>
+<p>Use <code>uv lock --upgrade</code> when intentionally refreshing dependencies, then review <code>pyproject.toml</code>, <code>uv.lock</code>, and the existing full test suite. The dependency floors were refreshed from current PyPI release metadata while preserving meaningful upstream upper bounds. Compatibility exceptions are documented with their resolver/test evidence rather than hidden by disabling tests.</p>
+<p>The <code>src/</code> layout and build-backend package discovery preserve public import names. Wheel/sdist resources include the source-associated data and templates. Optional vendor SDKs, live credentials, databases and graphical/native libraries retain their original runtime requirements. Examples and test fixtures are not promoted into the library API.</p>
+<!-- prior-development-notes -->
+
+<h2 id="compatibility-decisions">Compatibility decisions<a class="headerlink" href="#compatibility-decisions" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The complete162-case upstream suite passes. Tests use an absolute directory because conftest changes the working directory before testpath resolution.</li>
+<li>Alpha all-NaN rolling windows return NaN using guarded counts, sums and variances rather than warning-producing reductions. RPC worker shutdown closes sockets and terminates its owned ZeroMQ context.</li>
+<li>Current statsmodels and the SQLite database plugin are explicit alpha/dev dependencies needed by supplied tests. Qt/native ML extras constrain Python support.</li>
+</ul>
+<h1 id="development-guide">Development Guide<a class="headerlink" href="#development-guide" title="Permanent link">&para;</a></h1>
+<h2 id="development-setup">Development Setup<a class="headerlink" href="#development-setup" title="Permanent link">&para;</a></h2>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Python 3.13</strong> (required -- see <code>requires-python = "==3.13.*"</code> in <code>pyproject.toml</code>)</li>
+<li><strong>uv</strong> (recommended package manager)</li>
+<li><strong>TA-Lib</strong> C library (must be installed system-wide before pip install)</li>
+</ul>
+<h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash"># Clone the repository
+git clone https://github.com/vnpy/vnpy.git
+cd vnpy
+
+# Switch to development branch
+git checkout feature/ayu_develop
+
+# Install with uv (recommended)
+uv sync --active --all-groups --all-extras
+
+# Or install with pip in editable mode
+pip install -e &quot;.[alpha]&quot;
+
+# Install dev dependencies
+pip install -e &quot;.[dev-legacy]&quot;
+</code></pre>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<p>VeighNa stores configuration and data in a <code>.vntrader</code> directory:
+- If <code>.vntrader/</code> exists in the current working directory, it uses that
+- Otherwise, it creates/uses <code>~/.vntrader/</code></p>
+<p>Key configuration file: <code>.vntrader/vt_setting.json</code> (overrides defaults from <code>SETTINGS</code> dict).</p>
+<h3 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash"># Run all tests
+pytest
+
+# Run with specific options (configured in pyproject.toml)
+pytest -ra -q --strict-markers
+
+# Run specific test file
+pytest tests/test_specific.py
+
+# Run with coverage
+pytest --cov=vnpy
+</code></pre>
+<h3 id="code-quality">Code Quality<a class="headerlink" href="#code-quality" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash"># Format code
+black src/vnpy/
+
+# Lint
+ruff check src/vnpy/
+
+# Type checking
+mypy src/vnpy/
+</code></pre>
+<h2 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
+<pre><code>vnpy/
+├── pyproject.toml                    # Project metadata, dependencies, tool config
+├── src/
+│   └── vnpy/
+│       ├── __init__.py               # Version: __version__ = &quot;4.3.0&quot;
+│       ├── py.typed                  # PEP 561 type marker
+│       │
+│       ├── event/                    # Event-driven framework
+│       │   ├── __init__.py           # Exports: Event, EventEngine, EVENT_TIMER
+│       │   └── engine.py            # EventEngine, Event, HandlerType
+│       │
+│       ├── trader/                   # Core trading module
+│       │   ├── __init__.py
+│       │   ├── engine.py            # MainEngine, BaseEngine, OmsEngine, LogEngine, EmailEngine
+│       │   ├── gateway.py           # BaseGateway abstract class
+│       │   ├── app.py               # BaseApp abstract class
+│       │   ├── object.py            # Data classes: TickData, BarData, OrderData, etc.
+│       │   ├── constant.py          # Enums: Direction, Status, Exchange, Product, etc.
+│       │   ├── event.py             # Event type constants: EVENT_TICK, EVENT_ORDER, etc.
+│       │   ├── database.py          # BaseDatabase, BarOverview, TickOverview
+│       │   ├── datafeed.py          # BaseDatafeed
+│       │   ├── converter.py         # OffsetConverter, PositionHolding
+│       │   ├── optimize.py          # OptimizationSetting, brute force &amp; GA optimization
+│       │   ├── setting.py           # SETTINGS dict, loads vt_setting.json
+│       │   ├── utility.py           # Helpers: load_json, save_json, BarGenerator, ArrayManager
+│       │   ├── logger.py            # Loguru logger configuration
+│       │   ├── locale/              # i18n (Babel-based, Chinese/English)
+│       │   │   ├── __init__.py      # _() translation function
+│       │   │   ├── build_hook.py    # Hatch build hook for .mo compilation
+│       │   │   └── en/LC_MESSAGES/  # English translations
+│       │   └── ui/                  # Desktop GUI (PySide6)
+│       │       ├── __init__.py
+│       │       ├── qt.py            # Qt imports and app creation
+│       │       ├── mainwindow.py    # MainWindow class
+│       │       └── widget.py        # Monitor widgets, dialogs
+│       │
+│       ├── chart/                    # K-line charting (pyqtgraph)
+│       │   ├── __init__.py
+│       │   ├── widget.py            # ChartWidget, ChartCursor
+│       │   ├── item.py              # ChartItem (candles, volume, etc.)
+│       │   ├── manager.py           # BarManager (data management)
+│       │   ├── base.py              # Colors, fonts, constants
+│       │   └── axis.py              # DatetimeAxis
+│       │
+│       ├── rpc/                      # ZeroMQ RPC framework
+│       │   ├── __init__.py
+│       │   ├── server.py            # RpcServer (REP + PUB)
+│       │   ├── client.py            # RpcClient (REQ + SUB)
+│       │   └── common.py            # Heartbeat constants
+│       │
+│       └── alpha/                    # Alpha research module
+│           ├── __init__.py          # Exports: AlphaLab, AlphaDataset, AlphaModel, etc.
+│           ├── lab.py               # AlphaLab (research workspace)
+│           ├── logger.py            # Alpha-specific logger
+│           ├── dataset/             # Factor datasets
+│           │   ├── __init__.py
+│           │   ├── template.py      # AlphaDataset class
+│           │   ├── utility.py       # Segment enum, expression helpers
+│           │   ├── processor.py     # Data processors
+│           │   ├── math_function.py # Math factor functions
+│           │   ├── ts_function.py   # Time-series factor functions
+│           │   ├── cs_function.py   # Cross-section factor functions
+│           │   ├── ta_function.py   # Technical analysis factor functions
+│           │   └── datasets/        # Pre-built datasets (Alpha101, Alpha158)
+│           ├── model/               # ML models
+│           │   ├── __init__.py
+│           │   ├── template.py      # AlphaModel abstract class
+│           │   └── models/          # Implementations
+│           │       ├── lgb_model.py  # LightGBM model
+│           │       ├── mlp_model.py  # MLP (PyTorch) model
+│           │       └── lasso_model.py # Lasso regression model
+│           └── strategy/            # Portfolio strategies
+│               ├── __init__.py
+│               ├── template.py      # AlphaStrategy abstract class
+│               ├── backtesting.py   # BacktestingEngine
+│               └── strategies/      # Strategy implementations
+│                   └── equity_demo_strategy.py
+│
+├── tests/                            # Test suite
+├── docs/                             # Documentation (this directory)
+└── scripts/                          # Utility scripts
+</code></pre>
+<h2 id="gateway-development-guide">Gateway Development Guide<a class="headerlink" href="#gateway-development-guide" title="Permanent link">&para;</a></h2>
+<p>To create a new gateway for connecting to an exchange:</p>
+<h3 id="1-create-the-gateway-package">1. Create the gateway package<a class="headerlink" href="#1-create-the-gateway-package" title="Permanent link">&para;</a></h3>
+<p>Gateway implementations live in separate packages named <code>vnpy_{gateway_name}</code> (e.g., <code>vnpy_ctp</code>, <code>vnpy_ib</code>).</p>
+<h3 id="2-implement-basegateway">2. Implement BaseGateway<a class="headerlink" href="#2-implement-basegateway" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from vnpy.event import EventEngine
+from vnpy.trader.gateway import BaseGateway
+from vnpy.trader.object import (
+    TickData, OrderData, TradeData, PositionData,
+    AccountData, ContractData, LogData,
+    SubscribeRequest, OrderRequest, CancelRequest,
+    HistoryRequest, BarData, Exchange
+)
+from vnpy.trader.constant import Direction, OrderType, Offset, Status
+
+
+class MyExchangeGateway(BaseGateway):
+    &quot;&quot;&quot;Gateway for MyExchange.&quot;&quot;&quot;
+
+    default_name: str = &quot;MYEXCHANGE&quot;
+
+    default_setting: dict = {
+        &quot;api_key&quot;: &quot;&quot;,
+        &quot;api_secret&quot;: &quot;&quot;,
+        &quot;server&quot;: &quot;REAL&quot;,      # REAL or TEST
+    }
+
+    exchanges: list[Exchange] = [Exchange.SMART]
+
+    def __init__(self, event_engine: EventEngine, gateway_name: str) -&gt; None:
+        super().__init__(event_engine, gateway_name)
+        # Initialize exchange API client, websocket connections, etc.
+
+    def connect(self, setting: dict) -&gt; None:
+        &quot;&quot;&quot;Connect to the exchange.
+
+        Must:
+        1. Establish connection using credentials from setting
+        2. Log connection status via write_log()
+        3. Query and push contracts via on_contract()
+        4. Query and push account info via on_account()
+        5. Query and push positions via on_position()
+        6. Query and push open orders via on_order()
+        &quot;&quot;&quot;
+        api_key = setting[&quot;api_key&quot;]
+        api_secret = setting[&quot;api_secret&quot;]
+        # ... establish connection ...
+        self.write_log(&quot;Exchange connected&quot;)
+
+    def close(self) -&gt; None:
+        &quot;&quot;&quot;Close the gateway connection.&quot;&quot;&quot;
+        pass
+
+    def subscribe(self, req: SubscribeRequest) -&gt; None:
+        &quot;&quot;&quot;Subscribe to market data for a symbol.&quot;&quot;&quot;
+        # Subscribe to exchange websocket for the symbol
+        pass
+
+    def send_order(self, req: OrderRequest) -&gt; str:
+        &quot;&quot;&quot;Send a new order. Returns vt_orderid.
+
+        Must:
+        1. Create OrderData from req using req.create_order_data()
+        2. Assign a unique orderid
+        3. Send to exchange
+        4. Set status to SUBMITTING (success) or REJECTED (failure)
+        5. Call on_order() to push the order event
+        6. Return vt_orderid
+        &quot;&quot;&quot;
+        # Generate unique order ID
+        self.order_count += 1
+        orderid = str(self.order_count)
+
+        order = req.create_order_data(orderid, self.gateway_name)
+        order.status = Status.SUBMITTING
+        self.on_order(order)
+
+        # Send to exchange API
+        # ...
+
+        return order.vt_orderid
+
+    def cancel_order(self, req: CancelRequest) -&gt; None:
+        &quot;&quot;&quot;Cancel an existing order.&quot;&quot;&quot;
+        # Send cancel to exchange API
+        pass
+
+    def query_account(self) -&gt; None:
+        &quot;&quot;&quot;Query account balance.&quot;&quot;&quot;
+        # Fetch from exchange, create AccountData, call on_account()
+        pass
+
+    def query_position(self) -&gt; None:
+        &quot;&quot;&quot;Query holding positions.&quot;&quot;&quot;
+        # Fetch from exchange, create PositionData, call on_position()
+        pass
+
+    def query_history(self, req: HistoryRequest) -&gt; list[BarData]:
+        &quot;&quot;&quot;Query historical bar data (optional).&quot;&quot;&quot;
+        # Fetch from exchange API
+        return []
+</code></pre>
+<h3 id="3-key-gateway-requirements">3. Key gateway requirements<a class="headerlink" href="#3-key-gateway-requirements" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Thread-safety</strong>: All methods must be thread-safe with no mutable shared state</li>
+<li><strong>Non-blocking</strong>: Methods should not block the calling thread</li>
+<li><strong>Auto-reconnect</strong>: Implement automatic reconnection on connection loss</li>
+<li><strong>Immutable callbacks</strong>: Data passed to <code>on_*</code> callbacks must not be modified afterward; use <code>copy.copy()</code> if caching data internally</li>
+<li><strong>Dual event push</strong>: The <code>on_tick</code>, <code>on_trade</code>, <code>on_order</code>, <code>on_position</code>, <code>on_account</code>, and <code>on_quote</code> methods push both a general event and a symbol/id-specific event</li>
+</ul>
+<h3 id="4-register-the-gateway">4. Register the gateway<a class="headerlink" href="#4-register-the-gateway" title="Permanent link">&para;</a></h3>
+<p>In the application startup code:</p>
+<pre><code class="language-python">from vnpy.trader.engine import MainEngine
+from vnpy.event import EventEngine
+from my_gateway import MyExchangeGateway
+
+event_engine = EventEngine()
+main_engine = MainEngine(event_engine)
+main_engine.add_gateway(MyExchangeGateway)
+</code></pre>
+<h2 id="strategy-development-cta-template">Strategy Development (CTA Template)<a class="headerlink" href="#strategy-development-cta-template" title="Permanent link">&para;</a></h2>
+<p>CTA strategies operate on single instruments. While the CTA engine itself is an external app (<code>vnpy_ctastrategy</code>), strategy development follows a standard template pattern.</p>
+<h3 id="basic-cta-strategy-pattern">Basic CTA Strategy Pattern<a class="headerlink" href="#basic-cta-strategy-pattern" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from vnpy.trader.object import BarData, TickData, TradeData, OrderData
+from vnpy.trader.constant import Direction, Offset
+
+
+class MyCtaStrategy:
+    &quot;&quot;&quot;Example CTA strategy structure.&quot;&quot;&quot;
+
+    # Strategy parameters (can be optimized)
+    fast_window: int = 10
+    slow_window: int = 30
+
+    # Strategy variables (runtime state)
+    fast_ma: float = 0
+    slow_ma: float = 0
+    pos: int = 0
+
+    def on_init(self) -&gt; None:
+        &quot;&quot;&quot;Called when strategy is initialized.
+
+        Load historical data for indicator warm-up.
+        &quot;&quot;&quot;
+        self.write_log(&quot;Strategy initialized&quot;)
+        self.load_bar(10)  # Load 10 days of history
+
+    def on_start(self) -&gt; None:
+        &quot;&quot;&quot;Called when strategy starts trading.&quot;&quot;&quot;
+        self.write_log(&quot;Strategy started&quot;)
+
+    def on_stop(self) -&gt; None:
+        &quot;&quot;&quot;Called when strategy stops.&quot;&quot;&quot;
+        self.write_log(&quot;Strategy stopped&quot;)
+
+    def on_bar(self, bar: BarData) -&gt; None:
+        &quot;&quot;&quot;Called on each new bar.
+
+        Core strategy logic goes here.
+        &quot;&quot;&quot;
+        # Update indicators
+        am = self.array_manager
+        am.update_bar(bar)
+        if not am.inited:
+            return
+
+        self.fast_ma = am.sma(self.fast_window)
+        self.slow_ma = am.sma(self.slow_window)
+
+        # Generate signals
+        if self.fast_ma &gt; self.slow_ma and self.pos == 0:
+            self.buy(bar.close_price, 1)
+        elif self.fast_ma &lt; self.slow_ma and self.pos &gt; 0:
+            self.sell(bar.close_price, 1)
+
+    def on_order(self, order: OrderData) -&gt; None:
+        &quot;&quot;&quot;Called on order update.&quot;&quot;&quot;
+        pass
+
+    def on_trade(self, trade: TradeData) -&gt; None:
+        &quot;&quot;&quot;Called on trade fill.&quot;&quot;&quot;
+        pass
+</code></pre>
+<h2 id="alpha-strategy-development">Alpha Strategy Development<a class="headerlink" href="#alpha-strategy-development" title="Permanent link">&para;</a></h2>
+<p>Alpha strategies operate on multi-asset portfolios using the built-in alpha framework.</p>
+<h3 id="alpha-strategy-pattern">Alpha Strategy Pattern<a class="headerlink" href="#alpha-strategy-pattern" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from vnpy.alpha.strategy.template import AlphaStrategy
+from vnpy.trader.object import BarData, TradeData
+
+
+class MyAlphaStrategy(AlphaStrategy):
+    &quot;&quot;&quot;Multi-asset portfolio strategy.&quot;&quot;&quot;
+
+    # Parameters
+    rebalance_days: int = 5
+    price_add: float = 0.01
+
+    # Variables
+    day_count: int = 0
+
+    def on_init(self) -&gt; None:
+        &quot;&quot;&quot;Initialize strategy.&quot;&quot;&quot;
+        self.write_log(&quot;Alpha strategy initialized&quot;)
+
+    def on_bars(self, bars: dict[str, BarData]) -&gt; None:
+        &quot;&quot;&quot;Called with bar data for all symbols.
+
+        bars is a dict: {vt_symbol: BarData}
+        &quot;&quot;&quot;
+        self.day_count += 1
+
+        if self.day_count % self.rebalance_days != 0:
+            return
+
+        # Get model signals
+        signal = self.get_signal()
+
+        # Set target positions based on signals
+        for vt_symbol in self.vt_symbols:
+            target = signal.get(vt_symbol, 0)
+            self.set_target(vt_symbol, target)
+
+        # Execute rebalancing
+        self.execute_trading(bars, self.price_add)
+
+    def on_trade(self, trade: TradeData) -&gt; None:
+        &quot;&quot;&quot;Handle trade fills.&quot;&quot;&quot;
+        pass
+</code></pre>
+<h3 id="running-an-alpha-backtest">Running an Alpha Backtest<a class="headerlink" href="#running-an-alpha-backtest" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from datetime import datetime
+from vnpy.alpha import AlphaLab, BacktestingEngine
+from vnpy.trader.constant import Interval
+
+# Set up lab and engine
+lab = AlphaLab(&quot;/path/to/lab&quot;)
+engine = BacktestingEngine(lab)
+
+# Configure backtest
+engine.set_parameters(
+    vt_symbols=[&quot;IF2401.CFFEX&quot;, &quot;IC2401.CFFEX&quot;],
+    interval=Interval.DAILY,
+    start=datetime(2023, 1, 1),
+    end=datetime(2023, 12, 31),
+    capital=1_000_000,
+    risk_free=0.03,
+    annual_days=240
+)
+
+# Load contract settings
+engine.load_contract_settings()
+
+# Load data and run
+engine.load_data()
+engine.add_strategy(MyAlphaStrategy, {})
+engine.run_backtesting()
+
+# View results
+engine.calculate_result()
+engine.calculate_statistics()
+engine.show_chart()
+</code></pre>
+<h2 id="app-development-guide">App Development Guide<a class="headerlink" href="#app-development-guide" title="Permanent link">&para;</a></h2>
+<p>Apps extend VeighNa with pluggable functionality. Each app is a separate package that registers with the platform.</p>
+<h3 id="1-define-the-app-class">1. Define the App class<a class="headerlink" href="#1-define-the-app-class" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from pathlib import Path
+from vnpy.trader.app import BaseApp
+from .engine import MyEngine
+
+
+class MyApp(BaseApp):
+    app_name: str = &quot;my_app&quot;
+    app_module: str = __module__
+    app_path: Path = Path(__file__).parent
+    display_name: str = &quot;My Application&quot;
+    engine_class: type = MyEngine
+    widget_name: str = &quot;MyWidget&quot;
+    icon_name: str = str(Path(__file__).parent.joinpath(&quot;ui&quot;, &quot;my_app.ico&quot;))
+</code></pre>
+<h3 id="2-implement-the-engine">2. Implement the Engine<a class="headerlink" href="#2-implement-the-engine" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from vnpy.event import Event, EventEngine
+from vnpy.trader.engine import BaseEngine, MainEngine
+from vnpy.trader.event import EVENT_TICK, EVENT_ORDER, EVENT_TRADE, EVENT_TIMER
+
+
+class MyEngine(BaseEngine):
+    def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -&gt; None:
+        super().__init__(main_engine, event_engine, &quot;my_app&quot;)
+        # Register event handlers
+        self.event_engine.register(EVENT_TICK, self.process_tick)
+        self.event_engine.register(EVENT_TIMER, self.process_timer)
+
+    def process_tick(self, event: Event) -&gt; None:
+        &quot;&quot;&quot;Handle tick events.&quot;&quot;&quot;
+        tick = event.data
+        # App-specific logic
+
+    def process_timer(self, event: Event) -&gt; None:
+        &quot;&quot;&quot;Handle timer events (every 1 second).&quot;&quot;&quot;
+        pass
+
+    def close(self) -&gt; None:
+        &quot;&quot;&quot;Clean up resources.&quot;&quot;&quot;
+        pass
+</code></pre>
+<h3 id="3-create-the-ui-widget">3. Create the UI widget<a class="headerlink" href="#3-create-the-ui-widget" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from vnpy.trader.ui import QtWidgets
+from vnpy.trader.engine import MainEngine
+from vnpy.event import EventEngine
+
+
+class MyWidget(QtWidgets.QWidget):
+    def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -&gt; None:
+        super().__init__()
+        self.main_engine = main_engine
+        self.event_engine = event_engine
+        self.init_ui()
+
+    def init_ui(self) -&gt; None:
+        self.setWindowTitle(&quot;My Application&quot;)
+        # Build PySide6 UI
+</code></pre>
+<h3 id="4-register-the-app">4. Register the app<a class="headerlink" href="#4-register-the-app" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">main_engine.add_app(MyApp)
+</code></pre>
+<p>The <code>MainWindow</code> automatically discovers registered apps and adds them to the "功能" (Functions) menu.</p>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<h3 id="test-structure">Test structure<a class="headerlink" href="#test-structure" title="Permanent link">&para;</a></h3>
+<p>Tests live in the <code>tests/</code> directory and use pytest with the configuration in <code>pyproject.toml</code>:</p>
+<pre><code class="language-toml">[tool.pytest.ini_options]
+minversion = &quot;9.0&quot;
+addopts = [&quot;-ra&quot;, &quot;-q&quot;, &quot;--strict-markers&quot;, &quot;--import-mode=importlib&quot;]
+testpaths = [&quot;tests&quot;]
+pythonpath = [&quot;src&quot;]
+</code></pre>
+<h3 id="writing-tests">Writing tests<a class="headerlink" href="#writing-tests" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">import pytest
+from vnpy.event import EventEngine, Event
+from vnpy.trader.constant import Exchange, Direction, Status
+from vnpy.trader.object import OrderData, TickData
+
+
+def test_event_engine_dispatch():
+    &quot;&quot;&quot;Test that EventEngine dispatches events to handlers.&quot;&quot;&quot;
+    engine = EventEngine()
+    received = []
+
+    def handler(event: Event):
+        received.append(event.data)
+
+    engine.register(&quot;test&quot;, handler)
+    engine.start()
+    engine.put(Event(&quot;test&quot;, &quot;hello&quot;))
+
+    import time
+    time.sleep(0.5)
+    engine.stop()
+
+    assert received == [&quot;hello&quot;]
+
+
+def test_order_is_active():
+    &quot;&quot;&quot;Test OrderData.is_active() status check.&quot;&quot;&quot;
+    order = OrderData(
+        symbol=&quot;IF2401&quot;,
+        exchange=Exchange.CFFEX,
+        orderid=&quot;001&quot;,
+        gateway_name=&quot;TEST&quot;
+    )
+    order.status = Status.SUBMITTING
+    assert order.is_active()
+
+    order.status = Status.ALLTRADED
+    assert not order.is_active()
+</code></pre>
+<h3 id="key-testing-patterns">Key testing patterns<a class="headerlink" href="#key-testing-patterns" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Use <code>EventEngine</code> in tests but remember to <code>start()</code> and <code>stop()</code> it</li>
+<li>Event processing is asynchronous -- add small delays or use synchronization</li>
+<li>Data objects are dataclasses -- construct them with required fields</li>
+<li>The <code>.vntrader</code> directory may be created during tests; use tmp directories when possible</li>
+</ul>
+<h2 id="configuration-reference">Configuration Reference<a class="headerlink" href="#configuration-reference" title="Permanent link">&para;</a></h2>
+<p>VeighNa reads settings from <code>.vntrader/vt_setting.json</code>, which overrides the defaults in <code>src/vnpy/trader/setting.py</code>. If <code>.vntrader/</code> exists in the current working directory it is used; otherwise <code>~/.vntrader/</code> is used.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>font.family</code></td>
+<td><code>str</code></td>
+<td><code>"微软雅黑"</code></td>
+<td>GUI font family</td>
+</tr>
+<tr>
+<td><code>font.size</code></td>
+<td><code>int</code></td>
+<td><code>12</code></td>
+<td>GUI font size</td>
+</tr>
+<tr>
+<td><code>log.active</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td>Enable/disable logging</td>
+</tr>
+<tr>
+<td><code>log.level</code></td>
+<td><code>int</code></td>
+<td><code>20</code> (INFO)</td>
+<td>Python logging level (10=DEBUG, 20=INFO, 30=WARNING)</td>
+</tr>
+<tr>
+<td><code>log.console</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td>Log output to console</td>
+</tr>
+<tr>
+<td><code>log.file</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td>Log output to file</td>
+</tr>
+<tr>
+<td><code>email.server</code></td>
+<td><code>str</code></td>
+<td><code>"smtp.qq.com"</code></td>
+<td>SMTP server for email alerts</td>
+</tr>
+<tr>
+<td><code>email.port</code></td>
+<td><code>int</code></td>
+<td><code>465</code></td>
+<td>SMTP port</td>
+</tr>
+<tr>
+<td><code>email.username</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>SMTP username</td>
+</tr>
+<tr>
+<td><code>email.password</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>SMTP password</td>
+</tr>
+<tr>
+<td><code>email.sender</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Sender email address</td>
+</tr>
+<tr>
+<td><code>email.receiver</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Receiver email address</td>
+</tr>
+<tr>
+<td><code>datafeed.name</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Datafeed module name (e.g., <code>"vnpy_rqdata"</code>)</td>
+</tr>
+<tr>
+<td><code>datafeed.username</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Datafeed account username</td>
+</tr>
+<tr>
+<td><code>datafeed.password</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Datafeed account password</td>
+</tr>
+<tr>
+<td><code>database.timezone</code></td>
+<td><code>str</code></td>
+<td><em>(auto-detected)</em></td>
+<td>Timezone for database timestamps (via <code>tzlocal</code>)</td>
+</tr>
+<tr>
+<td><code>database.name</code></td>
+<td><code>str</code></td>
+<td><code>"sqlite"</code></td>
+<td>Database backend (<code>"sqlite"</code>, <code>"mysql"</code>, <code>"postgresql"</code>, <code>"mongodb"</code>, <code>"influxdb"</code>)</td>
+</tr>
+<tr>
+<td><code>database.database</code></td>
+<td><code>str</code></td>
+<td><code>"database.db"</code></td>
+<td>Database name or file path</td>
+</tr>
+<tr>
+<td><code>database.host</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Database host (empty for SQLite)</td>
+</tr>
+<tr>
+<td><code>database.port</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+<td>Database port (0 for SQLite)</td>
+</tr>
+<tr>
+<td><code>database.user</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Database username</td>
+</tr>
+<tr>
+<td><code>database.password</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Database password</td>
+</tr>
+</tbody>
+</table>
+<p>Example <code>vt_setting.json</code>:</p>
+<pre><code class="language-json">{
+    &quot;log.level&quot;: 10,
+    &quot;database.name&quot;: &quot;postgresql&quot;,
+    &quot;database.host&quot;: &quot;localhost&quot;,
+    &quot;database.port&quot;: 5432,
+    &quot;database.database&quot;: &quot;vnpy&quot;,
+    &quot;database.user&quot;: &quot;trader&quot;,
+    &quot;database.password&quot;: &quot;secret&quot;,
+    &quot;datafeed.name&quot;: &quot;vnpy_rqdata&quot;,
+    &quot;datafeed.username&quot;: &quot;myuser&quot;,
+    &quot;datafeed.password&quot;: &quot;mytoken&quot;
+}
+</code></pre>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="1-modulenotfounderror-no-module-named-vnpy_ctp-or-other-vnpy_-module">1. <code>ModuleNotFoundError: No module named 'vnpy_ctp'</code> (or other <code>vnpy_*</code> module)<a class="headerlink" href="#1-modulenotfounderror-no-module-named-vnpy_ctp-or-other-vnpy_-module" title="Permanent link">&para;</a></h3>
+<p>Gateway and app modules are distributed as separate packages. Install the one you need:</p>
+<pre><code class="language-bash">pip install vnpy_ctp vnpy_ctastrategy
+</code></pre>
+<h3 id="2-ta-lib-installation-fails">2. TA-Lib installation fails<a class="headerlink" href="#2-ta-lib-installation-fails" title="Permanent link">&para;</a></h3>
+<p>TA-Lib requires a system-level C library before the Python wrapper can be installed:</p>
+<pre><code class="language-bash"># Ubuntu/Debian
+sudo apt-get install -y libta-lib-dev
+
+# macOS
+brew install ta-lib
+
+# Then install the Python wrapper
+pip install ta-lib
+</code></pre>
+<h3 id="3-pyside6-qt-platform-plugin-errors">3. PySide6 / Qt platform plugin errors<a class="headerlink" href="#3-pyside6-qt-platform-plugin-errors" title="Permanent link">&para;</a></h3>
+<p>If you see <code>qt.qpa.plugin: Could not find the Qt platform plugin</code>:</p>
+<pre><code class="language-bash"># Linux: install platform dependencies
+sudo apt-get install -y libxcb-xinerama0 libegl1
+
+# Or run headless (no GUI):
+export QT_QPA_PLATFORM=offscreen
+</code></pre>
+<h3 id="4-vntrader-directory-not-found-or-settings-not-loading">4. <code>.vntrader</code> directory not found or settings not loading<a class="headerlink" href="#4-vntrader-directory-not-found-or-settings-not-loading" title="Permanent link">&para;</a></h3>
+<p>VeighNa looks for <code>.vntrader/</code> in the current working directory first, then falls back to <code>~/.vntrader/</code>. Ensure you run your scripts from the project root, or create the directory manually:</p>
+<pre><code class="language-bash">mkdir -p ~/.vntrader
+echo '{}' &gt; ~/.vntrader/vt_setting.json
+</code></pre>
+<h3 id="5-eventengine-events-not-being-received">5. EventEngine events not being received<a class="headerlink" href="#5-eventengine-events-not-being-received" title="Permanent link">&para;</a></h3>
+<p>Events are processed asynchronously in a background thread. After calling <code>event_engine.put()</code>, allow time for dispatch:</p>
+<pre><code class="language-python">import time
+event_engine.put(Event(&quot;test&quot;, data))
+time.sleep(0.5)  # wait for async processing
+</code></pre>
+<p>Always call <code>event_engine.start()</code> before putting events and <code>event_engine.stop()</code> when done.</p>
+<h3 id="6-gateway-connection-timeout-or-authentication-failure">6. Gateway connection timeout or authentication failure<a class="headerlink" href="#6-gateway-connection-timeout-or-authentication-failure" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Verify credentials in the gateway's <code>default_setting</code> dict</li>
+<li>Check network connectivity to the exchange (CTP uses specific IPs/ports)</li>
+<li>Ensure your IP is whitelisted on the exchange</li>
+<li>For CTP test environment, use <code>vnpy_ctptest</code> instead of <code>vnpy_ctp</code></li>
+</ul>
+<h3 id="7-importerror-with-polars-or-lightgbm-when-using-alpha-module">7. <code>ImportError</code> with <code>polars</code> or <code>lightgbm</code> when using Alpha module<a class="headerlink" href="#7-importerror-with-polars-or-lightgbm-when-using-alpha-module" title="Permanent link">&para;</a></h3>
+<p>The Alpha module requires optional dependencies:</p>
+<pre><code class="language-bash">pip install -e &quot;.[alpha]&quot;
+# or
+uv sync --active --all-extras
+</code></pre>
+<h3 id="8-database-timezone-mismatch">8. Database timezone mismatch<a class="headerlink" href="#8-database-timezone-mismatch" title="Permanent link">&para;</a></h3>
+<p>If bar timestamps appear shifted, check that <code>database.timezone</code> in <code>vt_setting.json</code> matches your data source. The default uses the system timezone detected by <code>tzlocal</code>.</p>
+<h3 id="9-python-version-incompatibility">9. Python version incompatibility<a class="headerlink" href="#9-python-version-incompatibility" title="Permanent link">&para;</a></h3>
+<p>VeighNa 4.x requires exactly Python 3.13.x (<code>requires-python = "==3.13.*"</code>). Other versions will fail to install.</p>
+<h3 id="10-encoding-errors-on-windows-with-chinese-characters">10. Encoding errors on Windows with Chinese characters<a class="headerlink" href="#10-encoding-errors-on-windows-with-chinese-characters" title="Permanent link">&para;</a></h3>
+<p>Ensure your terminal and Python environment support UTF-8:</p>
+<pre><code class="language-bash">set PYTHONIOENCODING=utf-8
+chcp 65001
+</code></pre>
+<h2 id="security-considerations">Security Considerations<a class="headerlink" href="#security-considerations" title="Permanent link">&para;</a></h2>
+<h3 id="api-key-management">API Key Management<a class="headerlink" href="#api-key-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Never commit credentials</strong> -- Gateway API keys, secrets, and passwords should never be checked into version control. Add <code>.vntrader/</code> to <code>.gitignore</code>.</li>
+<li><strong>Use environment variables</strong> -- For production deployments, consider loading credentials from environment variables rather than <code>vt_setting.json</code>:
+  <code>python
+  import os
+  setting = {
+      "api_key": os.environ["EXCHANGE_API_KEY"],
+      "api_secret": os.environ["EXCHANGE_API_SECRET"],
+  }
+  gateway.connect(setting)</code></li>
+<li><strong>CTP credentials</strong> -- CTP broker credentials (BrokerID, UserID, Password, AuthCode) grant full trading access. Treat them like banking credentials.</li>
+</ul>
+<h3 id="credential-storage">Credential Storage<a class="headerlink" href="#credential-storage" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>vt_setting.json</code> stores credentials in <strong>plaintext JSON</strong>. Restrict file permissions:
+  <code>bash
+  chmod 600 ~/.vntrader/vt_setting.json</code></li>
+<li>Gateway connection settings (API keys for each exchange) are stored in separate JSON files within <code>.vntrader/</code>. Apply the same file permission restrictions.</li>
+<li>The email password in <code>vt_setting.json</code> is also stored in plaintext -- use app-specific passwords where possible.</li>
+</ul>
+<h3 id="network-security">Network Security<a class="headerlink" href="#network-security" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>RPC framework</strong> -- The ZeroMQ-based RPC server/client (<code>vnpy.rpc</code>) does not provide built-in encryption or authentication. Only run RPC on trusted networks or behind a firewall.</li>
+<li><strong>Exchange connections</strong> -- CTP gateways use proprietary TCP protocols. Ensure your firewall allows outbound connections to broker-provided IPs and ports.</li>
+<li><strong>Interactive Brokers</strong> -- IB Gateway/TWS should be configured to accept connections only from localhost (<code>127.0.0.1</code>).</li>
+<li><strong>Web interface</strong> -- If using <code>vnpy_webtrader</code>, bind to <code>127.0.0.1</code> in production and place behind a reverse proxy with TLS.</li>
+</ul>
+<h3 id="database-security">Database Security<a class="headerlink" href="#database-security" title="Permanent link">&para;</a></h3>
+<ul>
+<li>SQLite databases (default) have no built-in access control. Protect the database file with filesystem permissions.</li>
+<li>For PostgreSQL/MySQL/MongoDB backends, use dedicated database users with minimal required privileges and enable TLS for remote connections.</li>
+<li>Database passwords in <code>vt_setting.json</code> are stored in plaintext -- restrict access to the configuration file.</li>
+</ul>
+<hr />
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="README.md">README</a> — Project overview and quick start</li>
+<li><a href="architecture.md">Architecture</a> — System design and components</li>
+<li><a href="workflow.md">Workflow</a> — Event flows and processing pipelines</li>
+<li><a href="state-management.md">State Management</a> — State lifecycle and data models</li>
+</ul></main>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@12.1.0/dist/mermaid.esm.min.mjs';
+mermaid.initialize({startOnLoad:true,securityLevel:'strict',theme:'default',flowchart:{useMaxWidth:true},sequence:{useMaxWidth:true}});
+</script></body></html>
